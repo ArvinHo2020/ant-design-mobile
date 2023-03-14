@@ -98,7 +98,17 @@ export const Selector = <V extends SelectorValue>(p: SelectorProps<V>) => {
         )}
         {active && props.showCheckMark && (
           <div className={`${classPrefix}-check-mark-wrapper`}>
-            <CheckMark />
+            {/* <CheckMark /> */}
+            <span
+              className='iconfont sg-icon-check'
+              style={{
+                fontSize: '10Px',
+                position: 'relative',
+                top: '-4Px',
+                right: '1Px',
+                color: 'white',
+              }}
+            ></span>
           </div>
         )}
       </div>

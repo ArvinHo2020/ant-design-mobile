@@ -175,6 +175,8 @@ export const SwipeAction = forwardRef<SwipeActionRef, SwipeActionProps>(
     useEffect(() => {
       if (!props.closeOnTouchOutside) return
       function handle(e: Event) {
+        console.log(44444)
+
         if (x.get() === 0) {
           return
         }
@@ -183,6 +185,8 @@ export const SwipeAction = forwardRef<SwipeActionRef, SwipeActionProps>(
           close()
         }
       }
+      console.log(document.addEventListener)
+
       document.addEventListener('touchstart', handle)
       return () => {
         document.removeEventListener('touchstart', handle)

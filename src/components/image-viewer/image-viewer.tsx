@@ -16,6 +16,7 @@ import Mask from '../mask'
 import SafeArea from '../safe-area'
 import { Slide } from './slide'
 import { Slides, SlidesRef } from './slides'
+import { Image, Swiper, SwiperItem } from '@tarojs/components'
 
 const classPrefix = `adm-image-viewer`
 
@@ -24,6 +25,7 @@ export type ImageViewerProps = {
   maxZoom?: number | 'auto'
   getContainer?: GetContainer
   visible?: boolean
+  onMaskClick?: () => void
   onClose?: () => void
   afterClose?: () => void
   renderFooter?: (image: string) => React.ReactNode
@@ -46,15 +48,20 @@ export const ImageViewer: FC<ImageViewerProps> = p => {
       afterClose={props.afterClose}
       destroyOnClose
     >
-      <div className={`${classPrefix}-content`}>
+      <div className={`${classPrefix}-content`} onClick={props.onMaskClick}>
         {props.image && (
-          <Slide
-            image={props.image}
-            onTap={() => {
-              props.onClose?.()
-            }}
-            maxZoom={props.maxZoom}
-          />
+          // <Slide
+          //   image={props.image}
+          //   onTap={() => {
+          //     props.onClose?.()
+          //   }}
+          //   maxZoom={props.maxZoom}
+          // />
+          <Image
+            mode='aspectFit'
+            style={{ width: '100%' }}
+            src={props.image}
+          ></Image>
         )}
       </div>
       {props.image && (
@@ -115,18 +122,24 @@ export const MultiImageViewer = forwardRef<
       afterClose={props.afterClose}
       destroyOnClose
     >
-      <div className={`${classPrefix}-content`}>
+      <div className={`${classPrefix}-content`} onClick={props.onMaskClick}>
         {props.images && (
-          <Slides
-            ref={slidesRef}
-            defaultIndex={index}
-            onIndexChange={onSlideChange}
-            images={props.images}
-            onTap={() => {
-              props.onClose?.()
-            }}
-            maxZoom={props.maxZoom}
-          />
+          <Swiper
+            autoplay
+            style={{ width: '100%' }}
+            current={props.defaultIndex}
+            onChange={(index: any) => props.onIndexChange?.(index)}
+          >
+            {props.images.map((item: any) => (
+              <SwiperItem>
+                <Image
+                  mode='aspectFit'
+                  style={{ width: '100%' }}
+                  src={item}
+                ></Image>
+              </SwiperItem>
+            ))}
+          </Swiper>
         )}
       </div>
       {props.images && (

@@ -120,6 +120,8 @@ export const Popover = forwardRef<PopoverRef, PopoverProps>((p, ref) => {
     const floating = floatingRef.current
     const arrowElement = arrowRef.current
     setTargetElement(target)
+    console.log(target, floating)
+
     if (!target || !floating || !arrowElement) return
     const {
       x,

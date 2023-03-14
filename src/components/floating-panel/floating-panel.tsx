@@ -66,6 +66,8 @@ export const FloatingPanel = forwardRef<FloatingPanelRef, FloatingPanelProps>(
     useDrag(
       state => {
         const [, offsetY] = state.offset
+        console.log(state)
+
         if (state.first) {
           const target = state.event.target as Element
           const header = headerRef.current

@@ -123,10 +123,10 @@ export const Tabs: FC<TabsProps> = p => {
     const activeLine = activeLineRef.current
     if (!activeLine) return
 
-    const activeTabWrapper = container.children.item(
+    const activeTabWrapper = container.children[
       activeIndex + 1
-    ) as HTMLDivElement
-    const activeTab = activeTabWrapper.children.item(0) as HTMLDivElement
+    ] as HTMLDivElement
+    const activeTab = activeTabWrapper.children[0] as HTMLDivElement
     const activeTabLeft = activeTab.offsetLeft
     const activeTabWidth = activeTab.offsetWidth
     const activeTabWrapperLeft = activeTabWrapper.offsetLeft

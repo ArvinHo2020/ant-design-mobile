@@ -79,7 +79,14 @@ export const Radio: FC<RadioProps> = p => {
     }
 
     return (
-      <div className={`${classPrefix}-icon`}>{checked && <CheckIcon />}</div>
+      <div className={`${classPrefix}-icon`}>
+        {checked && (
+          <span
+            className='iconfont sg-icon-check'
+            style={{ paddingLeft: '2Px' }}
+          />
+        )}
+      </div>
     )
   }
 
@@ -98,8 +105,8 @@ export const Radio: FC<RadioProps> = p => {
         onChange={setChecked}
         disabled={disabled}
         id={props.id}
+        renderIcon={renderIcon}
       />
-      {renderIcon()}
       {props.children && (
         <div className={`${classPrefix}-content`}>{props.children}</div>
       )}

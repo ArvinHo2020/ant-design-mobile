@@ -22,10 +22,8 @@ export const useTabListScroll = (
     if (!container) return
     if (activeIndex === undefined) return
 
-    const activeTabWrapper = container.children.item(
-      activeIndex
-    ) as HTMLDivElement
-    const activeTab = activeTabWrapper.children.item(0) as HTMLDivElement
+    const activeTabWrapper = container.children[activeIndex] as HTMLDivElement
+    const activeTab = activeTabWrapper.children[0] as HTMLDivElement
     const activeTabLeft = activeTab.offsetLeft
     const activeTabWidth = activeTab.offsetWidth
 

@@ -123,8 +123,8 @@ export const Checkbox = forwardRef<CheckboxRef, CheckboxProps>((p, ref) => {
         onChange={setChecked}
         disabled={disabled}
         id={props.id}
+        renderIcon={renderIcon}
       />
-      {renderIcon()}
       {props.children && (
         <div className={`${classPrefix}-content`}>{props.children}</div>
       )}

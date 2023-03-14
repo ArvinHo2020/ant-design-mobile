@@ -29,7 +29,7 @@ export const defaultPopupBaseProps = {
   destroyOnClose: false,
   disableBodyScroll: true,
   forceRender: false,
-  getContainer: () => document.body,
+  getContainer: process.env.TARO_ENV === 'h5' ? () => document.body : null,
   mask: true,
   showCloseButton: false,
   stopPropagation: ['click'],

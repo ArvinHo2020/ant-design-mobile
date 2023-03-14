@@ -4,3 +4,21 @@
   overflow: hidden;
   line-height: 1.5;
 }
+
+.adm-ellipsis {
+  display: flex;
+  .adm-ellipsis-text {
+    cursor: pointer;
+    display: inline;
+    color: var(--adm-color-primary);
+  }
+
+  .adm-ellipsis-wordbreak {
+    word-break: break-all;
+  }
+}
+
+.adm-ellipsis-copy {
+  position: absolute;
+  top: -999999px;
+}

@@ -6,7 +6,6 @@ import {
   disconnectedImage,
   emptyImage,
 } from './images'
-
 const imageRecord: Record<
   'default' | 'disconnected' | 'empty' | 'busy',
   ReactElement

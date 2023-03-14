@@ -7,6 +7,7 @@ import { useDebounceEffect } from 'ahooks'
 import { PickerProps } from '../picker'
 import { defaultRenderLabel } from '../picker/picker-utils'
 import SpinLoading from '../spin-loading'
+import PickerSlot from './pickerSlot.taro'
 
 const classPrefix = `adm-picker-view`
 
@@ -99,7 +100,7 @@ export const PickerView = memo<PickerViewProps>(p => {
 
   return withNativeProps(
     props,
-    <div className={`${classPrefix}`}>
+    <div className={`${classPrefix} nut-picker-panel`}>
       {props.loading ? (
         props.loadingContent
       ) : (

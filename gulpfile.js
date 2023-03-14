@@ -9,6 +9,7 @@ const del = require('del')
 const webpackStream = require('webpack-stream')
 const webpack = require('webpack')
 const through = require('through2')
+const gulpWatch = require('gulp-watch')
 const vite = require('vite')
 const rename = require('gulp-rename')
 const autoprefixer = require('autoprefixer')
@@ -19,16 +20,26 @@ const packageJson = require('./package.json')
 const StatoscopeWebpackPlugin = require('@statoscope/webpack-plugin').default
 const pxMultiplePlugin = require('postcss-px-multiple')({ times: 2 })
 
+const IS_WATCH = process.env.compileType === 'watch'
+
 function clean() {
   return del('./lib/**')
 }
 
 function buildStyle() {
-  return gulp
-    .src(['./src/**/*.less'], {
-      base: './src/',
-      ignore: ['**/demos/**/*', '**/tests/**/*', '*.patch.less'],
-    })
+  const compileFileList = ['./src/**/*.less']
+  let result = gulp.src(compileFileList, {
+    base: './src/',
+    ignore: ['**/demos/**/*', '**/tests/**/*', '*.patch.less'],
+  })
+  if (IS_WATCH) {
+    result = result.pipe(
+      gulpWatch(compileFileList).on('change', filePath => {
+        console.info(`file ${filePath} has changed`)
+      })
+    )
+  }
+  return result
     .pipe(
       less({
         paths: [path.join(__dirname, 'src')],
@@ -68,8 +79,14 @@ function copyAssets() {
 }
 
 function buildCJS() {
-  return gulp
-    .src(['lib/es/**/*.js'])
+  const compileFileList = ['lib/es/**/*.js']
+  let result = gulp.src(compileFileList)
+  if (IS_WATCH) {
+    result = result.pipe(
+      gulpWatch(compileFileList).on('change', filePath => {})
+    )
+  }
+  return result
     .pipe(
       babel({
         'plugins': ['@babel/plugin-transform-modules-commonjs'],
@@ -78,19 +95,56 @@ function buildCJS() {
     .pipe(gulp.dest('lib/cjs/'))
 }
 
+function watchTs() {
+  const compileFileList = ['src/**/*.{ts,tsx}']
+
+  let result = gulp.src(compileFileList, {
+    ignore: ['**/demos/**/*', '**/tests/**/*'],
+  })
+
+  result = result.pipe(
+    gulpWatch(compileFileList).on('change', filePath => {
+      console.info(`file ${filePath} has changed`)
+      buildES()
+    })
+  )
+}
+
 function buildES() {
+  const compileFileList = ['src/**/*.{ts,tsx}']
+
   const tsProject = ts({
     ...tsconfig.compilerOptions,
-    module: 'ES6',
+    module: 'es2015',
   })
+
   return gulp
-    .src(['src/**/*.{ts,tsx}'], {
+    .src(compileFileList, {
       ignore: ['**/demos/**/*', '**/tests/**/*'],
     })
     .pipe(tsProject)
     .pipe(
       babel({
         'plugins': ['./babel-transform-less-to-css'],
+      })
+    )
+    .pipe(gulp.dest('lib/es/'))
+}
+
+function copyJS() {
+  const compileFileList = ['src/**/*.{js,jsx}']
+  let result = gulp.src(compileFileList)
+  if (IS_WATCH) {
+    result = result.pipe(
+      gulpWatch(compileFileList).on('change', filePath => {
+        console.info(`file ${filePath} has changed`)
+      })
+    )
+  }
+  return result
+    .pipe(
+      babel({
+        'presets': ['@babel/preset-react'],
       })
     )
     .pipe(gulp.dest('lib/es/'))
@@ -104,9 +158,10 @@ function buildDeclaration() {
       'react': ['node_modules/@types/react'],
       'rc-field-form': ['node_modules/rc-field-form'],
       '@react-spring/web': ['node_modules/@react-spring/web'],
+      '@react-spring/core': ['node_modules/@react-spring/core'],
       '@use-gesture/react': ['node_modules/@use-gesture/react'],
     },
-    module: 'ES6',
+    module: 'es2015',
     declaration: true,
     emitDeclarationOnly: true,
   })
@@ -273,27 +328,6 @@ function copyMetaFiles() {
   return gulp.src(['./README.md', './LICENSE.txt']).pipe(gulp.dest('./lib/'))
 }
 
-function generatePackageJSON() {
-  return gulp
-    .src('./package.json')
-    .pipe(
-      through.obj((file, enc, cb) => {
-        const rawJSON = file.contents.toString()
-        const parsed = JSON.parse(rawJSON)
-        delete parsed.scripts
-        delete parsed.devDependencies
-        delete parsed.publishConfig
-        delete parsed.files
-        delete parsed.resolutions
-        delete parsed.packageManager
-        const stringified = JSON.stringify(parsed, null, 2)
-        file.contents = Buffer.from(stringified)
-        cb(null, file)
-      })
-    )
-    .pipe(gulp.dest('./lib/'))
-}
-
 function init2xFolder() {
   return gulp
     .src('./lib/**', {
@@ -337,14 +371,15 @@ exports.default = gulp.series(
   clean,
   buildES,
   buildCJS,
+  copyJS,
   gulp.parallel(buildDeclaration, buildStyle),
   copyAssets,
   copyMetaFiles,
-  generatePackageJSON,
-  buildBundles,
+  // buildBundles,
   gulp.series(init2xFolder, build2xCSS),
   umdWebpack,
   copyUmd,
   copyPatchStyle(),
   copyPatchStyle('/2x')
 )
+exports.watch = gulp.parallel(watchTs, copyJS, buildCJS, buildStyle)
